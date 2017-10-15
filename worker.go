@@ -119,6 +119,7 @@ func PingWorker(pmap probemap, pset string, pval probe, dbclient client.Client, 
 		// Result processing happens async, this way the intervals don't desync
 		if len(pingresults) > 0 {
 			go WritePoints(dbclient, pingresults, dchan)
+			go HandleProm(pingresults)
 		} else {
 			// Workers that yield nothing are put on incremental backoff
 			if backoff <= 9 {
@@ -232,12 +233,6 @@ func WritePoints(dbclient client.Client, points []pingresult, dchan chan<- strin
 		if err != nil {
 			dchan <- err.Error()
 		}
-		// Prometheus metric handling
-		latency.WithLabelValues("avg", point.probename, point.probeset, hostname, point.host, point.target).Set(point.avg)
-		latency.WithLabelValues("max", point.probename, point.probeset, hostname, point.host, point.target).Set(point.max)
-		latency.WithLabelValues("min", point.probename, point.probeset, hostname, point.host, point.target).Set(point.min)
-		losspct.WithLabelValues(point.probename, point.probeset, hostname, point.host, point.target).Set(float64(point.losspct))
-
 		// Influx data writing
 		batch.AddPoint(influxpt)
 	}

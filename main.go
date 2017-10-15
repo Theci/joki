@@ -16,9 +16,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"net/http"
 )
 
 func main() {
@@ -68,8 +65,7 @@ func main() {
 	dchan := make(chan string)
 	RunWorkers(probesets, dbclient, dchan)
 
-	http.Handle("/metrics", promhttp.Handler())
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	PromExporter()
 
 	for {
 		fmt.Println(<-dchan)
