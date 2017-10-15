@@ -3,3 +3,7 @@ joki
 
 # Configurations
 config.toml
+
+# vim temp files
+.*
+*~
