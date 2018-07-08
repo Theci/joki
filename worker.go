@@ -11,7 +11,6 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"github.com/influxdata/influxdb/client/v2"
 	"github.com/spf13/viper"
@@ -106,7 +105,7 @@ func PingWorker(pmap probemap, pset string, pval probe, dbclient client.Client, 
 					}
 				}
 			} else if err != nil {
-				logErr(errors.New(fmt.Sprintf("%s - %s - %s", pset, pval.name, err.Error())))
+				logErr(fmt.Errorf(fmt.Sprintf("%s - %s - %s", pset, pval.name, err.Error())))
 			}
 		}
 
@@ -126,7 +125,7 @@ func PingWorker(pmap probemap, pset string, pval probe, dbclient client.Client, 
 				backoff++
 			}
 			timer = time.NewTimer(time.Minute * time.Duration(backoff))
-			logErr(errors.New(fmt.Sprintf("Worker %s - %s  yielded no results, sleeping for %d minute(s)",
+			logErr(fmt.Errorf(fmt.Sprintf("Worker %s - %s  yielded no results, sleeping for %d minute(s)",
 				pset, pval.name, backoff)))
 		}
 
@@ -184,7 +183,7 @@ func PingParser(text string) (pingresult, error) {
 			result.losspct = 100
 		}
 	} else {
-		return result, errors.New(fmt.Sprintf("Error parsing FPing output: %s", text))
+		return result, fmt.Errorf(fmt.Sprintf("Error parsing FPing output: %s", text))
 	}
 
 	return result, nil
