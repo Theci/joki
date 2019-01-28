@@ -43,5 +43,5 @@ func HandleProm(points []pingresult) {
 
 func PromExporter() {
 	http.Handle("/metrics", promhttp.Handler())
-	log.Fatal(http.ListenAndServe(":65080", nil))
+	log.Fatal(http.ListenAndServe(":9602", nil))
 }
